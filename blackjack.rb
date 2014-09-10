@@ -49,9 +49,21 @@ deck.shuffle!
 player_hand = []
 dealer_hand = []
 
+player_hand << deck.pop
+dealer_hand << deck.pop
+player_hand << deck.pop
+dealer_hand << deck.pop
+
+dealer_total = calculate_total(dealer_hand)
+player_total = calculate_total(player_hand)
+
 def hit(hand)
   hand.collect { |i| i.join("") }
 end
+
+loop do
+player_hand = []
+dealer_hand = []
 
 player_hand << deck.pop
 dealer_hand << deck.pop
@@ -61,7 +73,6 @@ dealer_hand << deck.pop
 dealer_total = calculate_total(dealer_hand)
 player_total = calculate_total(player_hand)
 
-begin
 
   puts "Hey there hotshot, looking to play some Blackjack? What's your name?"
   name = gets.chomp
@@ -76,68 +87,80 @@ begin
   puts
 
   if player_total == 21
-    puts "Blackjack baby! Well played." 
+    puts "Blackjack baby! Well played."
+  elsif dealer_total == 21
+    puts "Sorry about your luck, #{name}!"
   else
     puts "Would you like to hit or stay?"
     move = gets.chomp.downcase
   end
-    
+
   while move == "hit"
     player_hand << deck.pop
-    calculate_total(player_hand)
+    player_total = calculate_total(player_hand)
     puts "Here's your hand now: #{hit(player_hand)}, bringing your total to: #{player_total} "
-    if player_total < 21
-      puts "Would you like to hit or stay?"
-      move = gets.chomp
-    else
+
+    if player_total > 21
       puts "Looks like a bust!"
+      break
+    elsif player_total == 21
+      puts "Blackjack baby!"
+      break
+    elsif dealer_total == 21
+      puts "Sorry about your luck, #{name}!"
+      break
+    else
+      puts "Would you like to hit or stay?"
+      move = gets.chomp.downcase
     end
-        
   end
-  puts "So #{name}, looks like you're at #{player_total}."
+    
+  puts "Okay #{name}, looks like you're at #{player_total}."
   puts
-  puts "Let's see what I've got"
+  puts "So I've got #{dealer_total}"
   while dealer_total < 17
+    puts "Guess I'll be hitting."
     dealer_hand << deck.pop
+    dealer_total = calculate_total(dealer_hand)
+    puts "Here are my cards: #{hit(dealer_hand)}, bringing my total to: #{dealer_total}."
     if dealer_total > 21
       puts "Looks like I've got a bust!"
+      break
     elsif dealer_total == 21
       puts "Looks like blackjack for me!"
-    else
-      puts "Here are my cards: #{dealer_hand}."
+      break
+      else
+      puts "Looks like my total is #{dealer_total}."
     end
   end
 
-  if dealer_total == 21 && player_total < 21
+  puts "If I'm at #{dealer_total}, and you've got #{player_total}, then that means..."
+  puts
+  if dealer_total == 21 && player_total < 21 || dealer_total == 21 && player_total > 21 || dealer_total < 21 && dealer_total > player_total || dealer_total < 21 && player_total > 21
     puts "Sorry about your luck, #{name}!"
-  elsif dealer_total == 21 && player_total > 21
-    puts "Sorry about your luck, #{name}!"
-  elsif dealer_total < 21 && dealer_total > player_total
-    puts "Sorry about your luck, #{name}!"
-
-  elsif player_total == 21 && dealer_total < 21
+  elsif player_total == 21 && dealer_total < 21 || player_total == 21 && dealer_total > 21 || player_total < 21 && player_total > dealer_total || player_total < 21 && dealer_total > 21
     puts "Great game, #{name}!"
-  elsif player_total == 21 && dealer_total > 21
-    puts "Great game, #{name}!"
-  elsif player_total < 21 && player_total > dealer_total
-    puts "Great game, #{name}!"
-   
-  elsif dealer_total == 21 && player_total == 21
-    puts "It would appear we have a tie, #{name}."
   else
-    puts "No winners here!"
+    puts "It would appear we have a push, #{name}."
+  end
+
+  puts "Would you like to play again? (y/n)"
+  answer = gets.chomp.downcase
+
+  if answer == "y"
+    redo
+  else
+    puts "So long!"
+    break
   end
 end
 
 
 =begin
-
 **NOTES**
 
-line 81: need to find a way to show cards in player_hand neatly as a string rather than 2d array. need to join the individual indices, with a space or comma in between
+-still looking for a way to make the hands print more neatly, and not as an array.
 
-line 81: new card is not being added into the total, but is being added to array.
-
-
+-must correct syntax so that it will only accept "hit" or "stay" as input
 
 =end

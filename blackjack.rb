@@ -62,6 +62,7 @@ def hit(hand)
 end
 
 loop do
+system 'clear'
 player_hand = []
 dealer_hand = []
 
